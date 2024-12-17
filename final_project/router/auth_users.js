@@ -41,14 +41,14 @@ regd_users.post("/login", (req,res) => {
     if(authenticatedUser(username,password)){
         let accessToken = jwt.sign({
             data:password
-        }, 'access', {expiresIn: 120 * 60});
+        }, 'access', {expiresIn: 120 * 120});
 
-        res.session.authorization = {
+        req.session.auth = {
             accessToken, username
         }
-        return res.status(200).send("User successfuly logged");
+        return res.status(200).send("User successfuly logged in");
     }else{
-        return res.send("Inavlid Login, check username and password");
+        return res.status(208).json({ message: "Inavlid Login, check username and password"});
     }
 });
 

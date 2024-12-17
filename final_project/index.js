@@ -10,15 +10,15 @@ const app = express();
 app.use(express.json());
 
 app.get("/users",(req,res)=>{
-    res.send(users);
+    res.send(JSON.stringify(users,null,2));
 })
 
 app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}))
 
 app.use("/customer/auth/*", function auth(req,res,next){
-    // Check if the user is logged in and has alid acces token 
-    if(req.session.authorization) {
-        let token = req.session.authorization['accessToken'];
+    // Check if the user is logged in and has valid acces token 
+    if(req.session.auth) {
+        let token = req.session.auth['accessToken'];
 
         // verify JWT token
         jwt.verify(token, "access", (err,user) => {
