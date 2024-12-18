@@ -36,17 +36,18 @@ regd_users.post("/login", (req,res) => {
     const password = req.body.password;
 
     if(!username || !password){
-        return res.status(404).json({ message: "Erro logging in"});
+        return res.status(400).json({ message: "Error logging in 1 "});
     }
 
     if(authenticatedUser(username,password)){
         let accessToken = jwt.sign({
             data:password
-        }, 'access', {expiresIn: 120 * 120});
+        }, 'access', {expiresIn: '1h'});
 
         req.session.auth = {
-            accessToken, username
-        }
+            accessToken: accessToken, 
+            username: username
+        };
         return res.status(200).send("User successfuly logged in");
     }else{
         return res.status(208).json({ message: "Inavlid Login, check username and password"});
@@ -55,17 +56,37 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-    const isbn = req.params.isbn;
-    const user = req.session.auth;
-    let review = req.query.review;
-    
-    if(review){
-        books[isbn].reviews = {
-            "review": review,
-            "username": user
-        };
-        res.send("Your review has been added!");
+    if(!req.session.auth || !req.session.auth.username){
+        return res.send("You haven´t access, pleas log in first");
     }
+    let book = books[req.params.isbn];
+    let review = req.body.review
+    book.reviews = {
+        "review": review,
+        "username": req.session.auth.username
+    };
+    res.status(202).send(`The review: "${review}" has been added in  ${book.title} by user ${req.session.auth.username}!`);
+
+});
+regd_users.delete("/auth/review/:isbn",(req,res)=>{
+    
+
+if(req.session.auth || req.session.auth.username){
+       let book = books[req.params.isbn];
+    let review = book.reviews;
+
+    if(review.username === req.session.auth.username){
+        delete review[req.session.auth.username];
+        return res.send(`The review by ${username} has been deleted`);
+    }
+}else{
+    return res.status(401).send("You don´t have access, please log in first");
+}
+});
+
+regd_users.get("/auth/reviews/:isbn",(req,res)=>{
+    let book = books[req.params.isbn].reviews;
+    res.send(book);
 });
 
 module.exports.authenticated = regd_users;

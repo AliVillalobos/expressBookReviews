@@ -30,7 +30,8 @@ app.use("/customer/auth/*", function auth(req,res,next){
             }
         });
     }else{
-        return res.status(403).json({ message: "Error loggin in"});
+        return res.status(403).json({ message: "Error logging in 2"});
+        
     }
 });
  
