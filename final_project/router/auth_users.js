@@ -62,31 +62,34 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     let book = books[req.params.isbn];
     let review = req.body.review
     book.reviews = {
-        "review": review,
-        "username": req.session.auth.username
-    };
+        "username": req.session.auth.username,
+        "review": review
+        };
     res.status(202).send(`The review: "${review}" has been added in  ${book.title} by user ${req.session.auth.username}!`);
 
 });
 regd_users.delete("/auth/review/:isbn",(req,res)=>{
     
-
-if(req.session.auth || req.session.auth.username){
-       let book = books[req.params.isbn];
-    let review = book.reviews;
-
-    if(review.username === req.session.auth.username){
-        delete review[req.session.auth.username];
-        return res.send(`The review by ${username} has been deleted`);
-    }
-}else{
+if(!req.session.auth || !req.session.auth.username){
+    
     return res.status(401).send("You don´t have access, please log in first");
 }
+    let book = books[req.params.isbn];
+    let review = book.reviews;
+
+    if(review['username'] === req.session.auth.username){
+        delete review['username'];
+        delete review['review'];
+        return res.send(`The review by ${req.session.auth.username} has been deleted`);
+    }else{
+        res.send("You haven´t reviews about this book");
+    }
+
 });
 
 regd_users.get("/auth/reviews/:isbn",(req,res)=>{
-    let book = books[req.params.isbn].reviews;
-    res.send(book);
+    let book = books[req.params.isbn];
+    res.send(book.reviews);
 });
 
 module.exports.authenticated = regd_users;
