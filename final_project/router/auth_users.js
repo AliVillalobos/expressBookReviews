@@ -68,6 +68,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     res.status(202).send(`The review: "${review}" has been added in  ${book.title} by user ${req.session.auth.username}!`);
 
 });
+// Delete a book review
 regd_users.delete("/auth/review/:isbn",(req,res)=>{
     
 if(!req.session.auth || !req.session.auth.username){
@@ -87,10 +88,6 @@ if(!req.session.auth || !req.session.auth.username){
 
 });
 
-regd_users.get("/auth/reviews/:isbn",(req,res)=>{
-    let book = books[req.params.isbn];
-    res.send(book.reviews);
-});
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
